@@ -1,5 +1,5 @@
 var fs = require('fs');
-var friends = require("../../core/friends");
+var friends = require('../../core/friends');
 var logger = require('../../core/logger.js');
 
 var config;
@@ -17,29 +17,30 @@ var yes = 0;
 var no = 0;
 var activeVote = false;
 var removalTime = 0;
-var vote = "There is no active vote.";
+var vote = 'There is no active vote.';
 
 // Handler.
 exports.handle = function(input, source) {
-  input = input.split(" ");
-  if (input[0] == "vote") {
+  input = input.split(' ');
+  if (input[0] == 'vote') {
     var now =  new Date().getTime();
     if (input.length == 1) {
       if (activeVote) {
-        friends.messageUser(source, "Current vote:  \"" + vote + "\". \nYes: " + yes + ". \nNo: " + no + ".  \nRemaining time to vote: " + Math.floor((removalTime - now)/1000) + " seconds.");
+        friends.messageUser(source, 'Current vote:  \"' + vote + '\". \nYes: ' + yes + '. \nNo: ' + no + '.  \nRemaining time to vote: ' + Math.floor((removalTime - now)/1000) + ' seconds.');
       }
       else if (!activeVote) {
         friends.messageUser(source, vote);
       }
     }
-    else if (input.length > 2 && input[1].toLowerCase() == "start") {
+    else if (input.length > 2 && input[1].toLowerCase() == 'start') {
       if (activeVote) {
-        friends.messageUser(source, "There is already an active vote.  Will expire in: " + Math.floor((removalTime - now)/1000) + " seconds.");
+        friends.messageUser(source, 'There is already an active vote.  Will expire in: ' + Math.floor((removalTime - now)/1000) + ' seconds.');
       }
       else if (!activeVote) {
         input.splice(0, 2);
-        vote = input.join(" ");
-        friends.messageUser(source, "Okay starting a vote for: \"" + vote +"\"\n The vote will last for: " + config.default/1000 + " seconds.");
+        vote = input.join(' ');
+        friends.broadcast(source, friends.nameOf(source) + ' has started a vote: \"' + vote  + '\". You have ' + config.default/1000 + ' seconds to vote.');
+        friends.messageUser(source, 'Okay starting a vote for: \"' + vote +'\"\n The vote will last for:'  + config.default/1000 + ' seconds.');
         removalTime = new Date().getTime() + config.default;
         activeVote=true;
         setTimeout(function() {
@@ -47,14 +48,14 @@ exports.handle = function(input, source) {
         }, config.default);
       }
     }
-    else if (input[1].toLowerCase() == "yes") {
+    else if (input[1].toLowerCase() == 'yes') {
       if (hasAlreadyVoted(source)) {
-        friends.messageUser(source, "You can only vote once.");
+        friends.messageUser(source, 'You can only vote once.');
       }
       else if (!hasAlreadyVoted(source)) {
         if (activeVote) {
           yes++;
-          friends.messageUser(source, "Recorded your vote for: YES. \nYes: " + yes + ". \nNo: " + no + ".");
+          friends.messageUser(source, 'Recorded your vote for: YES. \nYes: ' + yes + '. \nNo: ' + no + '.');
           voters.push(source);
         }
         else if (!activeVote) {
@@ -62,14 +63,14 @@ exports.handle = function(input, source) {
         }
       }
     }
-    else if (input[1].toLowerCase() == "no") {
+    else if (input[1].toLowerCase() == 'no') {
       if (hasAlreadyVoted(source)) {
-        friends.messageUser(source, "You can only vote once.");
+        friends.messageUser(source, 'You can only vote once.');
       }
       else if (!hasAlreadyVoted(source)) {
         if (activeVote) {
           no++;
-          friends.messageUser(source, "Recorded your vote for: NO. \nYes: " + yes + ". \nNo: " + no + ".");
+          friends.messageUser(source, 'Recorded your vote for: NO. \nYes: ' + yes + '. \nNo: ' + no + '.');
           voters.push(source);
         }
         else if (!activeVote) {
@@ -77,7 +78,7 @@ exports.handle = function(input, source) {
         }
       }
     }
-    else if (input[1].toLowerCase() == "duration") {
+    else if (input[1].toLowerCase() == 'duration') {
       if (friends.isAdmin(source)) {
         var newDuration = input.slice(2).join(' ');
         if (isNaN(newDuration)) {
@@ -130,9 +131,9 @@ function save() {
 
 exports.getHelp = function() {
   return '\nVOTE' + '\n--------\n' +
-  "vote start [SOME VOTE HERE] - will start the vote\n" +
-  "vote - shows the current item being voted on\n" +
-  "vote yes - will add a vote for yes\n" +
-  "vote no - will add a vote for no\n" +
-  "*<ADMIN ONLY>* vote duration [DURATION] - sets the amount of time votes will last for\n";
+  'vote start [SOME VOTE HERE] - will start the vote\n' +
+  'vote - shows the current item being voted on\n' +
+  'vote yes - will add a vote for yes\n' +
+  'vote no - will add a vote for no\n' +
+  '*<ADMIN ONLY>* vote duration [DURATION] - sets the amount of time votes will last for\n';
 }
