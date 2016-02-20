@@ -18,6 +18,7 @@ var no = 0;
 var activeVote = false;
 var removalTime = 0;
 var vote = 'There is no active vote.';
+var voteCreator;
 
 // Handler.
 exports.handle = function(input, source) {
@@ -39,9 +40,13 @@ exports.handle = function(input, source) {
       else if (!activeVote) {
         input.splice(0, 2);
         vote = input.join(' ');
-        friends.broadcast(source, friends.nameOf(source) + ' has started a vote: \"' + vote  + '\". You have ' + config.default/1000 + ' seconds to vote.');
-        friends.messageUser(source, 'Okay starting a vote for: \"' + vote +'\"\n The vote will last for:'  + config.default/1000 + ' seconds.');
+        friends.broadcast(source, friends.nameOf(source) + ' has started a vote: \"' + vote  + '\".' +
+         '\nYou have ' + config.default/1000 + ' seconds to vote.' +
+         '\n Type \"vote yes\" or \"vote no\" to vote now.');
+        friends.messageUser(source, 'Okay starting a vote for: \"' + vote +'\"\n The vote will last for: '  + config.default/1000 + ' seconds.');
         removalTime = new Date().getTime() + config.default;
+        voteCreator = source;
+        voters.push(source);
         activeVote=true;
         setTimeout(function() {
           resetVoting();
@@ -56,7 +61,9 @@ exports.handle = function(input, source) {
         if (activeVote) {
           yes++;
           friends.messageUser(source, 'Recorded your vote for: YES. \nYes: ' + yes + '. \nNo: ' + no + '.');
-          voters.push(source);
+          if (source != voteCreator) {
+            voters.push(source);
+          }
         }
         else if (!activeVote) {
           friends.messageUser(source, vote);
@@ -71,7 +78,9 @@ exports.handle = function(input, source) {
         if (activeVote) {
           no++;
           friends.messageUser(source, 'Recorded your vote for: NO. \nYes: ' + yes + '. \nNo: ' + no + '.');
-          voters.push(source);
+          if (source != voteCreator) {
+            voters.push(source);
+          }
         }
         else if (!activeVote) {
           friends.messageUser(source, vote);
