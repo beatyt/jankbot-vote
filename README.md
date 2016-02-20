@@ -10,8 +10,12 @@ This module is designed to allow users to create votes on a timer.
 
 Adding this module will add the following commands to your Jankbot:
 
-`vote start [SOME VOTE HERE] [OPTIONAL TIME]` will start the vote for a duration
+  `vote start [SOME VOTE HERE] - will start the vote`
 
-`vote yes` will add a vote for yes
+  `vote - shows the current item being voted on`
 
-`vote no` will add a vote for no
+  `vote yes - will add a vote for yes\n`
+
+  `vote no - will add a vote for no`
+  
+  `*<ADMIN ONLY>* vote duration [DURATION] - sets the amount of time votes will last for`
