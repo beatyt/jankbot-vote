@@ -1,0 +1,8 @@
+{
+  "name": "Vote",
+  "author": "beatyt",
+  "main": "vote.js",
+  "license": "MIT",
+  "description": "Allows users to create votes on a timer",
+  "compatible": "2.1.*"
+}
