@@ -22,8 +22,9 @@ var voteCreator;
 
 // Handler.
 exports.handle = function(input, source) {
+  input = input.replace(/"/g,'');
   input = input.split(' ');
-  if (input[0] == 'vote') {
+  if (input[0].toLowerCase() == 'vote') {
     var now =  new Date().getTime();
     if (input.length == 1) {
       if (activeVote) {
@@ -43,11 +44,12 @@ exports.handle = function(input, source) {
         friends.broadcast(source, friends.nameOf(source) + ' has started a vote: \"' + vote  + '\".' +
          '\nYou have ' + config.default/1000 + ' seconds to vote.' +
          '\n Type \"vote yes\" or \"vote no\" to vote now.');
-        friends.messageUser(source, 'Okay starting a vote for: \"' + vote +'\"\n The vote will last for: '  + config.default/1000 + ' seconds.');
+        friends.messageUser(source, 'Okay starting a vote for: \"' + vote +
+          '\"\n The vote will last for: '  + config.default/1000 + ' seconds.' +
+          '\n You can vote by typing \"vote yes\" or \"vote no\" to vote.');
         removalTime = new Date().getTime() + config.default;
         voteCreator = source;
-        voters.push(source);
-        activeVote=true;
+        activeVote = true;
         setTimeout(function() {
           resetVoting();
         }, config.default);
@@ -61,9 +63,7 @@ exports.handle = function(input, source) {
         if (activeVote) {
           yes++;
           friends.messageUser(source, 'Recorded your vote for: YES. \nYes: ' + yes + '. \nNo: ' + no + '.');
-          if (source != voteCreator) {
             voters.push(source);
-          }
         }
         else if (!activeVote) {
           friends.messageUser(source, vote);
@@ -78,9 +78,7 @@ exports.handle = function(input, source) {
         if (activeVote) {
           no++;
           friends.messageUser(source, 'Recorded your vote for: NO. \nYes: ' + yes + '. \nNo: ' + no + '.');
-          if (source != voteCreator) {
             voters.push(source);
-          }
         }
         else if (!activeVote) {
           friends.messageUser(source, vote);
@@ -106,17 +104,22 @@ exports.handle = function(input, source) {
 }
 
 function resetVoting() {
+  if (voters.indexOf(voteCreator) == -1) {
+      voters.push(voteCreator); // the owner never voted, so add them so they get messaged the results
+  }
   for (var voter in voters) {
     friends.messageUser(voters[voter], 'VOTE RESULTS for \"' + vote + '\"\n' +
       'Yes: ' + yes + '\n' +
       'No: ' + no + '\n');
   }
+  var oldVote = vote;
+  vote = 'There is no active vote.  The last vote of: \"' + oldVote + '\" had results of    Yes: ' + yes + '    No: ' + no;
   yes = 0;
   no = 0;
   activeVote = false;
-  vote = 'There is no active vote.';
   removalTime = 0;
   voters = [];
+  voteCreator = null;
 }
 
 function hasAlreadyVoted(source) {
