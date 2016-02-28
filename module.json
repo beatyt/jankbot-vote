@@ -4,5 +4,5 @@
   "main": "vote.js",
   "license": "MIT",
   "description": "Allows users to create votes on a timer",
-  "compatible": "2.1.*"
+  "compatible": "3.0.*"
 }

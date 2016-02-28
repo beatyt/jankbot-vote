@@ -1,6 +1,6 @@
 {
   "name": "jankbot-vote",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Allows users to create votes on a timer",
   "main": "vote.js",
   "scripts": {

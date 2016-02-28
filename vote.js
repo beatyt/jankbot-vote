@@ -28,7 +28,7 @@ exports.handle = function(input, source) {
     var now =  new Date().getTime();
     if (input.length == 1) {
       if (activeVote) {
-        friends.messageUser(source, 'Current vote:  \"' + vote + '\". \nYes: ' + yes + '. \nNo: ' + no + '.  \nRemaining time to vote: ' + Math.floor((removalTime - now)/1000) + ' seconds.');
+        friends.messageUser(source, 'Current vote:  \"' + vote + '\". \nYes: ' + yes + '. \nNo: ' + no + '.  \nRemaining time to vote: ' + timeConversion(removalTime) + '.');
       }
       else if (!activeVote) {
         friends.messageUser(source, vote);
@@ -36,16 +36,16 @@ exports.handle = function(input, source) {
     }
     else if (input.length > 2 && input[1].toLowerCase() == 'start') {
       if (activeVote) {
-        friends.messageUser(source, 'There is already an active vote.  Will expire in: ' + Math.floor((removalTime - now)/1000) + ' seconds.');
+        friends.messageUser(source, 'There is already an active vote.  Will expire in: ' + timeConversion(removalTime) + '.');
       }
       else if (!activeVote) {
         input.splice(0, 2);
         vote = input.join(' ');
         friends.broadcast(source, friends.nameOf(source) + ' has started a vote: \"' + vote  + '\".' +
-         '\nYou have ' + config.default/1000 + ' seconds to vote.' +
+         '\nYou have ' + timeConversion(config.default) + ' to vote.' +
          '\n Type \"vote yes\" or \"vote no\" to vote now.');
         friends.messageUser(source, 'Okay starting a vote for: \"' + vote +
-          '\"\n The vote will last for: '  + config.default/1000 + ' seconds.' +
+          '\"\n The vote will last for: '  + timeConversion(config.default) + '.' +
           '\n You can vote by typing \"vote yes\" or \"vote no\" to vote.');
         removalTime = new Date().getTime() + config.default;
         voteCreator = source;
@@ -92,7 +92,7 @@ exports.handle = function(input, source) {
           friends.messageUser(source, 'Duration should be a number, like 1, 15, 145, etc.');
         } else {
           setDuration(newDuration);
-          friends.messageUser(source, 'Okay, the new duration is ' + newDuration + ' seconds.');
+          friends.messageUser(source, 'Okay, the new duration is ' + timeConversion(newDuration) + '.');
       }
       }
     }
@@ -138,6 +138,36 @@ function setDuration(newDuration) {
 
 function save() {
   fs.writeFileSync('./data/vote.json', JSON.stringify(config));
+}
+
+function timeConversion(removalTime) {
+  var SECONDS_IN_MINUTE = 60;
+  var SECONDS_IN_HOUR = 3600;
+  var SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
+
+  var now =  new Date().getTime();
+  var timeInSeconds =  removalTime;
+  var primaryUnit;
+
+  if (timeInSeconds < SECONDS_IN_MINUTE && timeInSeconds > 0) {
+    primaryUnit = Math.floor(timeInSeconds);
+    return primaryUnit + (primaryUnit == 1 ? " second" : " seconds")
+  }
+  else if (timeInSeconds >= SECONDS_IN_MINUTE && timeInSeconds < SECONDS_IN_HOUR) {
+    primaryUnit = Math.floor(timeInSeconds / SECONDS_IN_MINUTE);
+    return primaryUnit + (primaryUnit == 1 ? " minute" : " minutes")
+  }
+  else if (timeInSeconds >= SECONDS_IN_HOUR && timeInSeconds < SECONDS_IN_DAY) {
+    primaryUnit = Math.floor(timeInSeconds / SECONDS_IN_HOUR);
+    return primaryUnit + (primaryUnit == 1 ? " hour" : " hours")
+  }
+  else if (timeInSeconds >= SECONDS_IN_DAY) {
+    primaryUnit = Math.floor(timeInSeconds / SECONDS_IN_DAY);
+    return primaryUnit + (primaryUnit == 1 ? " day" : " days")
+  }
+  else {
+    return timeInSeconds;
+  }
 }
 
 
